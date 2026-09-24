@@ -1,0 +1,15 @@
+node_modules/
+dist/
+release/
+.vite/
+.coverage/
+.nyc_output/
+.env
+.env.local
+*.log
+.DS_Store
+.idea/
+.vscode/
+*.AppImage
+*.deb
+*.rpm
