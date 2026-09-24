@@ -1,11 +1,12 @@
 :root {
   color: #f4f4f5;
-  background: #18181b;
+  background: transparent;
   font-family: system-ui, sans-serif;
 }
 
 body {
   margin: 0;
+  background: transparent;
 }
 
 .app {

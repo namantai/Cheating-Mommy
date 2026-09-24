@@ -1,39 +1,35 @@
 import { app, BrowserWindow } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { OverlayWindow } from './window/overlay-window.js';
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
 const isDevelopment = process.env.NODE_ENV === 'development';
 
-function createApplicationWindow(): BrowserWindow {
-  const window = new BrowserWindow({
-    width: 800,
-    height: 600,
-    webPreferences: {
-      contextIsolation: true,
-      nodeIntegration: false,
-      sandbox: true,
-      preload: path.join(currentDirectory, '../preload/index.js')
+const overlayWindow = new OverlayWindow({
+  createBrowserWindow: (options) => new BrowserWindow(options),
+  loadRenderer: (window) => {
+    if (isDevelopment) {
+      return window.loadURL('http://127.0.0.1:5173');
     }
-  });
 
-  if (isDevelopment) {
-    void window.loadURL('http://127.0.0.1:5173');
-  } else {
-    void window.loadFile(path.join(currentDirectory, '../renderer/index.html'));
-  }
-
-  return window;
-}
+    return window.loadFile(path.join(currentDirectory, '../renderer/index.html'));
+  },
+  preloadPath: path.join(currentDirectory, '../preload/index.js')
+});
 
 app.whenReady().then(() => {
-  createApplicationWindow();
+  overlayWindow.create();
 
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
-      createApplicationWindow();
+      overlayWindow.create();
     }
   });
+});
+
+app.on('before-quit', () => {
+  overlayWindow.destroy();
 });
 
 app.on('window-all-closed', () => {
