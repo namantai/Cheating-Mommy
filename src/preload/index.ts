@@ -1,2 +1,8 @@
-// Phase 1 intentionally exposes no privileged API to the renderer.
-// Future IPC capabilities must be explicit and typed.
+import { contextBridge, ipcRenderer } from 'electron';
+import { overlayIpcChannels, type OverlayApi } from '../shared/ipc/overlay.js';
+
+const overlayApi: OverlayApi = {
+  hide: () => ipcRenderer.send(overlayIpcChannels.hide)
+};
+
+contextBridge.exposeInMainWorld('overlay', overlayApi);

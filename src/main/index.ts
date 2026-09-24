@@ -1,6 +1,7 @@
-import { app, BrowserWindow } from 'electron';
+import { app, BrowserWindow, ipcMain } from 'electron';
 import { fileURLToPath } from 'node:url';
 import path from 'node:path';
+import { overlayIpcChannels } from '../shared/ipc/overlay.js';
 import { OverlayWindow } from './window/overlay-window.js';
 
 const currentDirectory = path.dirname(fileURLToPath(import.meta.url));
@@ -15,7 +16,11 @@ const overlayWindow = new OverlayWindow({
 
     return window.loadFile(path.join(currentDirectory, '../renderer/index.html'));
   },
-  preloadPath: path.join(currentDirectory, '../preload/index.js')
+  preloadPath: path.join(currentDirectory, '../preload/index.cjs')
+});
+
+ipcMain.on(overlayIpcChannels.hide, () => {
+  overlayWindow.hide();
 });
 
 app.whenReady().then(() => {
